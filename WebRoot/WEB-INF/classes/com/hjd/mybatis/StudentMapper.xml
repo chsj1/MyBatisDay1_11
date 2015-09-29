@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<!-- 
+XXXMapper.xml: 映射文件.完成实体类与数据库中表的映射关系.
+ -->
+<mapper namespace="com.hjd.mybatis.Student">
+
+	<!-- 指定你要映射的类型
+type:需要映射的类型的全路径名.(在这里使用了别名)
+id:给这一次映射起一个名字
+ -->
+	<resultMap type="student" id="studentmap">
+		<!--
+			<id/>： 主键属性的映射.其中property属性指的是实体类中成员变量的名字,column指的是表中 列的名字. <result/>
+			:非主键属性的映射
+		-->
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="sal" column="sal" />
+	</resultMap>
+
+	<!-- 
+<insert />:标签指明这是一个insert语句.
+id: 给这一个SQL语句起一个唯一标识
+ -->
+	<insert id="add1">
+		insert into students1(id,name,sal) values(2,'hjd',60000.0);
+</insert>
+
+
+
+	<!-- 
+插入语句：根据具体内容来插入
+ -->
+	<insert id="add2" parameterType="student">
+		insert into students1(id,name,sal) values(#{id},#{name},#{sal});
+</insert>
+
+	<!-- 
+update语句:根据具体内容来更新
+ -->
+	<update id="update1" parameterType="student">
+		update students1 set name=#{name},sal=#{sal} where id=#{id};
+ </update>
+
+	<!-- 
+update语句:动态更新
+ -->
+	<update id="dynamicupdate" parameterType="map">
+		update students1 
+         <set>
+         <if test="pname!=null">
+         name = #{pname}
+         </if>
+         <if test="psal!=null">
+         sal =#{psal}
+         </if>
+         </set>
+         where id =#{pid}
+;
+ </update>
+ 
+ 
+ 
+ 
+	<!-- 
+ 查询一条记录
+  -->
+	<select id="findById" parameterType="int" resultType="student">
+		select * from students1 where id = #{id};
+  </select>
+
+	<!-- 
+ 查询所有记录
+  -->
+	<select id="findAll" resultType="student">
+		select * from students1;
+  </select>
+
+	<!-- 
+  查询:分页查询
+   -->
+	<select id="findAllByPage" parameterType="map" resultType="student">
+		select * from students1 limit #{start},#{size};
+  </select>
+
+	<!-- 
+ 动态查询
+  -->
+	<select id="dynamicfind" resultType="student">
+		select * from students1
+		<!-- 天假where子句 -->
+		<where>
+		<!--如id的值不为空.即你穿了id的值进来 -->
+			<if test="id!=null">
+			<!-- 加上相应的where子句 -->
+				and id = #{id}
+  </if>
+			<if test="name!=null">
+				and name = #{name}
+  </if>
+			<if test="sal!=null">
+				and sal = #{sal}
+  </if>
+		</where>
+		;
+	</select>
+
+<!--
+		foreach用于迭代数组元素 open表示开始符号 close表示结束符合 separator表示元素间的分隔符
+		item表示迭代的数组，属性值可以任意，但提倡与方法的数组名相同 #{ids}表示数组中的每个元素值
+	-->
+	<delete id="dynamicdelete">
+		delete from students1 where id in
+		<foreach collection="array" open="(" close=")" separator=","
+			item="ids">
+			#{ids}
+		</foreach>
+
+	</delete>
+</mapper>
